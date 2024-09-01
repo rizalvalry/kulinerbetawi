@@ -1,5 +1,5 @@
 <script setup>
-import { ref, reactive, onMounted } from "vue";
+import { ref, reactive, onMounted, watch, inject } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import useAxios from "../services/axios";
 import useAlert from "../services/alert";
@@ -12,17 +12,26 @@ import { storeToRefs } from "pinia";
 
 import PageHeader from "../components/layouts/PageHeader.vue";
 
+const baseURL = inject('baseURL');
 const { user, isAuthenticated } = storeToRefs(useAuth());
 
 const route = useRoute();
 const router = useRouter();
 const errorData = ref();
-const responseData = ref();
+const responseData = ref(null);
 const productQuantity = ref(1);
 const formData = reactive({
     rating: "",
     comment: "",
 });
+
+watch(() => route.params.slug, (newSlug) => {
+    useAxios.get("/products/" + newSlug).then((response) => {
+        responseData.value = response.data;
+        useAxios.get("/products/view-count/" + responseData.value.product.id);
+    });
+});
+
 
 // Fetch specific product's details.
 onMounted(() => {
@@ -95,7 +104,7 @@ function productQuantityIncrement() {
                             <div class="carousel-item active">
                                 <img
                                     class="w-100 h-100"
-                                    :src="`http://127.0.0.1:8000/storage/products/${image}`"
+                                    :src="`${baseURL}/storage/products/${image}`"
                                     alt="image"
                                 />
                             </div>
@@ -443,7 +452,7 @@ function productQuantityIncrement() {
                                 >
                                     <img
                                         class="img-fluid w-100"
-                                        :src="`http://127.0.0.1:8000/storage/products/${data.image}`"
+                                        :src="`${baseURL}/storage/products/${data.image}`"
                                         alt="image"
                                     />
                                 </div>

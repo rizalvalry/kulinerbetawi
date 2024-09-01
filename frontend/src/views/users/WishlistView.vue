@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref, watch } from "vue";
+import { onMounted, ref, watch, inject } from "vue";
 import PageHeader from "../../components/layouts/PageHeader.vue";
 import useRefresh from "../../stores/Refresh";
 import { storeToRefs } from "pinia";
@@ -8,7 +8,7 @@ import useCart from "../../services/cart";
 import useWishlist from "../../services/wishlist";
 import { useRouter } from "vue-router";
 
-
+const baseURL = inject('baseURL');
 const router = useRouter();
 const { refreshWishlistPage } = storeToRefs(useRefresh());
 const wishlist = ref();
@@ -59,7 +59,7 @@ watch(refreshWishlistPage, () => {
                             <tr>
                                 <td class="align-middle">
                                     <img
-                                        :src="data.image"
+                                        :src="`${baseURL}/storage/products/${data.image}`"
                                         alt="image"
                                         style="width: 50px"
                                     />
